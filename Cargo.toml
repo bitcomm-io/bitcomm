@@ -1,0 +1,20 @@
+[package]
+name = "bitcomm"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+    bitflags = "2"
+    bytes    = "1"
+    getset   = "0.1"
+    rand     = "0"
+    s2n-quic = { version = "1", features = ["provider-event-tracing"] }
+    tokio = { version = "1", features = ["full"] }
+    tracing = "0.1"
+    tracing-subscriber = "0.3"
+    lazy_static = "1"
+    serde = { version = "1", features = ["derive"] }
+    machine-uid = "0.5"
+    md5 = "0.7.0"
