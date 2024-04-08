@@ -2,10 +2,7 @@ use std::sync::Arc;
 
 use tokio::sync::Mutex;
 use tracing::info;
-use crate::{
-    exserver::S2SMSPType,
-    queue::BitcommGramQueue,
-};
+use crate::{ exserver::S2SMSPType, queue::BitcommGramQueue };
 #[allow(unused_imports)]
 use crate::{ exserver::receive::{ self, server_data }, net::quic::qcutils };
 
@@ -20,7 +17,9 @@ pub async fn server_message_listening_server(
     let rct_queue = rct_queue.clone();
     let server_handle = tokio::spawn(async move {
         // 获取服务器实例
-        let mut server = qcutils::get_server(server_address.as_str(), server_port.as_str()).unwrap();
+        let mut server = qcutils
+            ::get_server(server_address.as_str(), server_port.as_str())
+            .unwrap();
         // 接受客户端连接并处理
         while let Some(mut connection) = server.accept().await {
             // 设置连接不超时

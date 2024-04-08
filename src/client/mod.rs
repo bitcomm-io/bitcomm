@@ -152,7 +152,7 @@ impl ClientPoolManager {
     pub async fn put_client(
         clt: u64,
         dev: u32,
-        stream: Arc<Mutex<SendStream>>,
+        stream: Arc<Mutex<SendStream>>
     ) -> Option<Arc<Mutex<SendStream>>> {
         // 如果还不存在,则插入新的,将设备状态设为ONLINE
         Self::set_device_state(clt, dev, DeviceConnState::STATE_ONLINE).await;
@@ -164,9 +164,7 @@ impl ClientPoolManager {
         // client_pool.remove(&get_key(clt, dev));//.map(|(v, _)| v);
         // remove_client(clt, dev);
         // }
-        client_pool
-            .insert(key, (stream, Instant::now() + _TIME_OUT_))
-            .map(|(v, _)| v)
+        client_pool.insert(key, (stream, Instant::now() + _TIME_OUT_)).map(|(v, _)| v)
     }
     /// 更新客户端的超时时间。
     ///

@@ -3,14 +3,11 @@ use std::{ sync::Arc, time::Duration };
 use bytes::Bytes;
 use tokio::time::sleep;
 
+use crate::object::gram::{ message::MessageGram, receipt::ReceiptGram };
 
-use crate::object::gram::{message::MessageGram, receipt::ReceiptGram};
-
-use super::{put_data_buff_to_queue, RESEND_BUFFER_2_SERVER};
+use super::{ put_data_buff_to_queue, RESEND_BUFFER_2_SERVER };
 
 pub static REMOVE_BUFFER_TIME: u64 = 5;
-
-
 
 /// 启动重新发送缓冲服务器的异步函数。
 ///
@@ -37,7 +34,6 @@ pub async fn start_resend_buffer_server() -> Arc<tokio::task::JoinHandle<()>> {
     });
     Arc::new(server_handle)
 }
-
 
 //
 pub async fn send_message2buffer(data_buff: &Arc<Bytes>, data_gram: &Arc<MessageGram>) {

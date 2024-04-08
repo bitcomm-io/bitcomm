@@ -1,5 +1,3 @@
-// 版权归bitcomm.io公司及其关联公司所有。保留所有权利。
-// SPDX-License-Identifier: Apache-2.0
 
 use s2n_quic::{client::Connect, Client, Connection};
 #[allow(unused_imports)]
