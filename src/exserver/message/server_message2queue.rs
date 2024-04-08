@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
 use bytes::Bytes;
+use s2n_quic::stream::SendStream;
+use tokio::sync::Mutex;
 // use s2n_quic::stream::SendStream;
 // use tokio::{ io::AsyncWriteExt, sync::Mutex };
 use tracing::info;
@@ -13,13 +15,13 @@ use crate::{ queue::{ BitcommGramQueue, GramEvent }, object::gram::message::Mess
 pub async fn send_server_message_to_queue(
     data_buff: &Arc<Bytes>,
     data_gram: &Arc<MessageGram>,
-    // stm: Arc<Mutex<SendStream>>,
+    stm: Arc<Mutex<SendStream>>,
     queue: &Arc<BitcommGramQueue>
 ) -> Option<Arc<MessageGram>> {
     //
     info!("client send message gram to server {:?}", data_gram);
-    let clt: u64 = data_gram.sender().into();
-    let dev: u32 = data_gram.device_id();
+    // let clt: u64 = data_gram.sender().into();
+    // let dev: u32 = data_gram.device_id();
 
     send_message_to_queue(data_buff, data_gram, queue).await;
     Some(data_gram.clone())
