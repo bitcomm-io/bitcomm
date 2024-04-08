@@ -7,6 +7,7 @@ pub mod imserver;
 pub mod exserver;
 pub mod config;
 pub mod queue;
+pub mod bridge;
 
 
 use lazy_static::lazy_static;

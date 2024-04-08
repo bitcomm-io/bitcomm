@@ -9,6 +9,7 @@ use tokio::{io::AsyncWriteExt, sync::RwLock};
 
 use crate::{object::gram::{message::MessageGram, receipt::ReceiptGram}, queue::{BitcommGramQueue, GramBufferPool, GramEvent, EVENT_QUEUE_LEN}};
 
+
 use super::get_s2s_msp;
 //
 lazy_static! {  
@@ -22,46 +23,8 @@ lazy_static! {
     };
     // static ref resend_buffer: Arc::new(RwLock::new(GramBufferPool::new(queue_size))),
 }
-// 
-pub async fn put_resend_data_queue(data_buff: &Arc<Bytes>,) {
-    if MessageGram::is_message(data_buff) {
-        let data_gram = Arc::new(*MessageGram::get_message_gram_by_u8(data_buff));
-        return put_resend_message_queue(data_buff,&data_gram).await;
-    }
-    if ReceiptGram::is_receipt(data_buff) {
-        let data_gram = Arc::new(*ReceiptGram::get_receipt_gram_by_u8(data_buff));
-        return put_resend_receipt_queue(data_buff,&data_gram).await;
-    }
-}
-// 
-pub async fn put_resend_receipt_queue(
-    data_buff: &Arc<Bytes>,
-    data_gram: &Arc<ReceiptGram>,
-) {
-    let sender = EXCHANGE_MESSAGE_CHANNEL.get_sender();
-    let msgevent = sender.lock().await;
-    msgevent
-        .send(GramEvent::ReceiptGramEvent {
-            data_buff: data_buff.clone(),
-            data_gram: data_gram.clone(),
-        }).await
-        .expect("send event error!");
-}
 
-pub async fn put_resend_message_queue(
-    data_buff: &Arc<Bytes>,
-    data_gram: &Arc<MessageGram>,
-) {
-    let sender = EXCHANGE_MESSAGE_CHANNEL.get_sender();
-    let msgevent = sender.lock().await;
-    msgevent
-        .send(GramEvent::MessagGramEvent {
-            data_buff: data_buff.clone(),
-            data_gram: data_gram.clone(),
-        }).await
-        .expect("send event error!");
-}
-
+// 
 pub async fn start_exchange_message_queue_server() -> Result<(), Box<dyn Error>> {
     // 获取消息事件队列的接收端
     let receiver = EXCHANGE_MESSAGE_CHANNEL.get_receiver();
@@ -70,12 +33,12 @@ pub async fn start_exchange_message_queue_server() -> Result<(), Box<dyn Error>>
         match event {
             // 处理消息接收事件
             GramEvent::MessagGramEvent { data_buff, data_gram } => {
-                send_message2buffer(&data_buff,&data_gram).await;
+                buffer::send_message2buffer(&data_buff,&data_gram).await;
                 send_message2server(&data_buff,&data_gram).await;
             }
             // 处理群组消息接收事件
             GramEvent::ReceiptGramEvent { data_buff, data_gram } => {
-                send_receipt2buffer(&data_buff,&data_gram).await;
+                buffer::send_receipt2buffer(&data_buff,&data_gram).await;
                 send_receipt2server(&data_buff,&data_gram).await;
             }
             _ => {} // 忽略其他类型的事件
@@ -83,11 +46,7 @@ pub async fn start_exchange_message_queue_server() -> Result<(), Box<dyn Error>>
     }
     Ok(())
 }
-//
-async fn send_message2buffer(data_buff: &Arc<Bytes>, data_gram: &Arc<MessageGram>) {
-    let mut buffer = RESEND_BUFFER_2_SERVER.write().await;
-    buffer.push(data_buff.clone(), data_gram.get_message_gram_key());
-}
+
 //
 async fn send_message2server(data_buff:&Arc<Bytes>,data_gram:&Arc<MessageGram>) {
     let client = data_gram.receiver();
@@ -98,11 +57,6 @@ async fn send_message2server(data_buff:&Arc<Bytes>,data_gram:&Arc<MessageGram>) 
     } else {
         // TODO: 增加找不到服务器的处理
     }
-}
-//
-async fn send_receipt2buffer(data_buff: &Arc<Bytes>, data_gram: &Arc<ReceiptGram>) {
-    let mut buffer = RESEND_BUFFER_2_SERVER.write().await;
-    buffer.push(data_buff.clone(), data_gram.get_receipt_gram_key());
 }
 //
 async fn send_receipt2server(data_buff:&Arc<Bytes>,data_gram:&Arc<ReceiptGram>) {
@@ -116,4 +70,42 @@ async fn send_receipt2server(data_buff:&Arc<Bytes>,data_gram:&Arc<ReceiptGram>) 
     }
 }
 
+// 
+pub async fn put_data_buff_to_queue(data_buff: &Arc<Bytes>,) {
+    if MessageGram::is_message(data_buff) {
+        let data_gram = Arc::new(*MessageGram::get_message_gram_by_u8(data_buff));
+        return put_message_gram_to_queue(data_buff,&data_gram).await;
+    }
+    if ReceiptGram::is_receipt(data_buff) {
+        let data_gram = Arc::new(*ReceiptGram::get_receipt_gram_by_u8(data_buff));
+        return put_receipt_gram_to_queue(data_buff,&data_gram).await;
+    }
+}
+// 
+pub async fn put_receipt_gram_to_queue(
+    data_buff: &Arc<Bytes>,
+    data_gram: &Arc<ReceiptGram>,
+) {
+    let sender = EXCHANGE_MESSAGE_CHANNEL.get_sender();
+    let msgevent = sender.lock().await;
+    msgevent
+        .send(GramEvent::ReceiptGramEvent {
+            data_buff: data_buff.clone(),
+            data_gram: data_gram.clone(),
+        }).await
+        .expect("send event error!");
+}
 
+pub async fn put_message_gram_to_queue(
+    data_buff: &Arc<Bytes>,
+    data_gram: &Arc<MessageGram>,
+) {
+    let sender = EXCHANGE_MESSAGE_CHANNEL.get_sender();
+    let msgevent = sender.lock().await;
+    msgevent
+        .send(GramEvent::MessagGramEvent {
+            data_buff: data_buff.clone(),
+            data_gram: data_gram.clone(),
+        }).await
+        .expect("send event error!");
+}

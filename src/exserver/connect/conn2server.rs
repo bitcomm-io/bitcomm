@@ -13,6 +13,7 @@ pub async fn connect_exchange_server(
     port: &str,
     msg_queue: &Arc<BitcommGramQueue>,
     rct_queue: &Arc<BitcommGramQueue>
+    
 ) -> Arc<Connection> {
 
     let mut connection = qcutils::get_client(server, port).await.unwrap(); //client.connect(connect).await?;

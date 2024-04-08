@@ -32,6 +32,7 @@ pub struct MessageGram {
     reserve2: u64,
     reserve3: u32,
     reserve4: u32,
+    #[getset(set = "pub", get_copy = "pub")]
     data_time: u32, // 时间戳
 
     #[getset(set = "pub", get_copy = "pub")]

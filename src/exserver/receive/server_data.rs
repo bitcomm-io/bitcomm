@@ -8,8 +8,7 @@ use tracing::error;
 use crate::object::gram::hookup::S2SHookupGram;
 use crate::object::gram::reply::ReplyGram;
 use crate::queue::BitcommGramQueue;
-use crate::exserver::{ hookup, message, receipt, S2SMSPType };
-// use crate::net::proc;
+use crate::exserver::{ hookup, message, receipt, reply, S2SMSPType };
 use crate::object::gram::message::MessageGram;
 use crate::object::gram::receipt::ReceiptGram;
 use crate::object::gram::{ BitcommDataGram, DataGramError };
@@ -20,7 +19,7 @@ pub async fn receive_data_gram(
     stm0: Arc<Mutex<SendStream>>,
     msg_queue: Arc<BitcommGramQueue>,
     rct_queue: Arc<BitcommGramQueue>,
-    s2smsp_type:S2SMSPType,
+    s2smsp_type: S2SMSPType
 ) {
     // 接收数据并处理
     while let Ok(Some(data_buff)) = receive_stream.receive().await {
@@ -31,7 +30,13 @@ pub async fn receive_data_gram(
             // 发送回执，服务器已收到，正在处理,如果是返回的信息，则无需再回执
             send_receipt_2_client(rc_data_gram.clone(), stm0.clone()).await;
             // 处理命令
-            if let Err(err) = process_server_command(rc_data_gram.clone(), stm0.clone(),s2smsp_type.clone()).await {
+            if
+                let Err(err) = process_server_command(
+                    rc_data_gram.clone(),
+                    stm0.clone(),
+                    s2smsp_type.clone()
+                ).await
+            {
                 error!("process command error: {}", err);
             }
             // 处理消息
@@ -48,7 +53,7 @@ pub async fn receive_data_gram(
         }
     }
 }
-
+//
 pub fn prepare_data_buffer(data_buff: Arc<Bytes>) -> Option<BitcommDataGram> {
     let bts = data_buff.as_ref();
 
@@ -82,7 +87,7 @@ pub fn prepare_data_buffer(data_buff: Arc<Bytes>) -> Option<BitcommDataGram> {
     }
     None
 }
-
+//
 #[allow(unused_variables)]
 pub async fn send_receipt_2_client(data: Arc<BitcommDataGram>, _stm: Arc<Mutex<SendStream>>) {
     match data.as_ref() {
@@ -91,23 +96,25 @@ pub async fn send_receipt_2_client(data: Arc<BitcommDataGram>, _stm: Arc<Mutex<S
         _ => {}
     }
 }
+//
 #[allow(unused_variables)]
 pub async fn process_server_command(
     data: Arc<BitcommDataGram>,
     stm: Arc<Mutex<SendStream>>,
-    s2smsp_type:S2SMSPType
+    s2smsp_type: S2SMSPType
 ) -> Result<Arc<BitcommDataGram>, DataGramError> {
     match data.as_ref() {
         // 处理命令
         BitcommDataGram::S2SHookup { data_buff, data_gram } =>
-            hookup::process_hookup(data_buff, data_gram, stm,s2smsp_type).await,
+            hookup::process_hookup(data_buff, data_gram, stm, s2smsp_type).await,
         // 应答信息包
-        BitcommDataGram::Reply { data_buff, data_gram } => {}
+        BitcommDataGram::Reply { data_buff, data_gram } =>
+            reply::process_reply(data_buff, data_gram, stm, s2smsp_type).await,
         _ => {}
     }
     Ok(data)
 }
-
+//
 #[allow(unused_variables)]
 pub async fn process_bitcomm_gram(
     data: Arc<BitcommDataGram>,
@@ -117,9 +124,9 @@ pub async fn process_bitcomm_gram(
 ) -> Result<Arc<BitcommDataGram>, DataGramError> {
     match data.as_ref() {
         BitcommDataGram::Message { data_buff, data_gram } =>
-            message::process_message_gram(data_buff, data_gram, stm,&msg_queue).await,
+            message::process_message_gram(data_buff, data_gram, stm, &msg_queue).await,
         BitcommDataGram::Receipt { data_buff, data_gram } =>
-            receipt::process_receipt_gram(data_buff, data_gram, &rct_queue).await,
+            receipt::process_receipt_gram(data_buff, data_gram, stm, &rct_queue).await,
         //
         _ => {}
     }

@@ -3,9 +3,14 @@ use std::{ sync::Arc, time::Duration };
 use bytes::Bytes;
 use tokio::time::sleep;
 
-use super::{put_resend_data_queue, RESEND_BUFFER_2_SERVER};
+
+use crate::object::gram::{message::MessageGram, receipt::ReceiptGram};
+
+use super::{put_data_buff_to_queue, RESEND_BUFFER_2_SERVER};
 
 pub static REMOVE_BUFFER_TIME: u64 = 5;
+
+
 
 /// 启动重新发送缓冲服务器的异步函数。
 ///
@@ -20,7 +25,7 @@ pub async fn start_resend_buffer_server() -> Arc<tokio::task::JoinHandle<()>> {
         loop {
             if get_buffer_size().await > 0 {
                 if let Some(data_buff) = pop_message_gram_from_buffer().await {
-                    put_resend_data_queue(&data_buff).await;
+                    put_data_buff_to_queue(&data_buff).await;
                 } else {
                     continue;
                 }
@@ -31,6 +36,18 @@ pub async fn start_resend_buffer_server() -> Arc<tokio::task::JoinHandle<()>> {
         }
     });
     Arc::new(server_handle)
+}
+
+
+//
+pub async fn send_message2buffer(data_buff: &Arc<Bytes>, data_gram: &Arc<MessageGram>) {
+    let mut buffer = RESEND_BUFFER_2_SERVER.write().await;
+    buffer.push(data_buff.clone(), data_gram.get_message_gram_key());
+}
+//
+pub async fn send_receipt2buffer(data_buff: &Arc<Bytes>, data_gram: &Arc<ReceiptGram>) {
+    let mut buffer = RESEND_BUFFER_2_SERVER.write().await;
+    buffer.push(data_buff.clone(), data_gram.get_receipt_gram_key());
 }
 
 /// 从发送消息缓冲区中获取消息对象的异步函数。

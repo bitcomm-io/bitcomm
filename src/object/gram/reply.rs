@@ -33,6 +33,12 @@ pub struct ReplyGram {
 }
 
 impl ReplyGram {
+
+    pub fn get_reply_gram_key(&self) -> u128 {
+        let num_u64_1 = self.sender().get_guid(); //((self.sender().planet().bits() as u64) << 32) | (self.sender().object() as u64);
+        let num_u64_2 = ((self.receiver().object() as u64) << 32) | (self.message_id() as u64);
+        ((num_u64_1 as u128) << 64) | (num_u64_2 as u128)
+    }
     //
     pub fn is_bitcomm_reply_flag(data_array: &[u8]) -> bool {
         if data_array.len() == std::mem::size_of::<BitcommFlag>() {
