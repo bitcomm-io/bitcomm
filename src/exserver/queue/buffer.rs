@@ -28,7 +28,7 @@ pub async fn start_resend_buffer_server(
         loop {
             if get_buffer_size(message_buffer.clone()).await > 0 {
                 if let Some(data_buff) = pop_message_gram_from_buffer(message_buffer.clone()).await {
-                    put_data_buff_to_queue(message_queue.clone(),&data_buff).await;
+                    put_data_buff_to_queue(&message_queue,&data_buff).await;
                 } else {
                     continue;
                 }

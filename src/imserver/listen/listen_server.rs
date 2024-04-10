@@ -21,14 +21,14 @@ pub async fn client_message_listening_server (
         while let Some(mut connection) = server.accept().await {
             // 设置连接不超时
             connection.keep_alive(true).unwrap();
-            let msg_queue = msg_queue.clone();
-            let rct_queue = rct_queue.clone(); 
+            // let msg_queue = msg_queue.clone();
+            // let rct_queue = rct_queue.clone(); 
             // 异步处理连接
-            tokio::spawn(async move {
+            // tokio::spawn(async move {
                 // 记录连接接受日志
                 info!("Connection accepted from {:?}", connection.remote_addr());
                 // 接受双向流
-                while let Ok(Some(stream)) = connection.accept_bidirectional_stream().await {
+                if let Ok(Some(stream)) = connection.accept_bidirectional_stream().await {
                     // 分割流为接收流和发送流
                     let (receive_stream, send_stream) = stream.split();
                     // 创建发送流的互斥锁
@@ -42,7 +42,7 @@ pub async fn client_message_listening_server (
                         // 在此需要清理IP->ClientID+DeviceID信息
                     });
                 }
-            });
+            // });
         }
     });
     Arc::new(server_handle)

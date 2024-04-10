@@ -40,7 +40,7 @@ async fn send_receipt_to_queue(
     data_gram: &Arc<ReceiptGram>
 ) {
     let sender = rct_queue.get_sender();
-    let reptevent = sender.lock().await;
+    let reptevent = sender.clone();
     reptevent
         .send(GramEvent::ReceiptGramEvent {
             data_buff: data_buff.clone(),

@@ -3,17 +3,13 @@ use s2n_quic::stream::SendStream;
 use tokio::{ io::AsyncWriteExt, sync::{ Mutex, RwLock } };
 
 use crate::{
-    exserver::{ receive, EXServer, S2SMSPType },
+    exserver::{ queue, receive, EXServer, S2SMSPType },
     net::quic::qcutils,
-    object::{
-        gram::{ hookup::S2SHookupGram, BitCommand, BitcommFlag, BitcommVersion },
-        BITServerID,
-    },
+    object::gram::{ hookup::S2SHookupGram, BitCommand, BitcommFlag, BitcommVersion },
     queue::BitcommGramQueue,
 };
 
 pub async fn connect_exchange_server(
-    local_server_id: BITServerID,
     server: &str,
     port: &str,
     ims_msg_queue: Arc<BitcommGramQueue>,
@@ -24,18 +20,28 @@ pub async fn connect_exchange_server(
     let stream = connection.open_bidirectional_stream().await.unwrap();
     //
     let (rece_stream, send_stream) = stream.split();
-    let (sstm, res_exserver) = receive::start_exserver_receive_server(
-        send_stream,
-        rece_stream,
-        connection,
+
+    let send_stream = Arc::new(Mutex::new(send_stream));
+    let rece_stream = Arc::new(Mutex::new(rece_stream));
+    let connection = Arc::new(connection);
+    let local_server_id = crate::SERVER_GUID.to_le();
+    // 初始化EXServer
+    let exserver = receive::init_exserver(
+        &send_stream,
+        &rece_stream,
+        &connection,
+        &S2SMSPType::Client,
         local_server_id,
-        S2SMSPType::Client,
-        ims_msg_queue,
-        ims_rct_queue
-    ).await;
+        &ims_msg_queue,
+        &ims_rct_queue
+    );
+    let exserver = Arc::new(RwLock::new(exserver));
+    // 启动接收服务
+    let exserver = receive::start_exserver_receive_server(&exserver).await;
     // 发送握手信息，以建立链接
-    send_hookup(sstm).await;
-    res_exserver
+    send_hookup(send_stream).await;
+    // 启动发送服务
+    queue::start_exserver_send_server(&exserver).await
 }
 
 // const MY_ERROR_CODE: u32 = 99;

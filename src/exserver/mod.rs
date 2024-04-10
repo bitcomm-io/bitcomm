@@ -32,6 +32,8 @@ use crate::queue::BitcommGramQueue;
 use crate::queue::GramBufferPool;
 use crate::queue::EVENT_QUEUE_LEN;
 
+// use self::receive::server_data;
+
 // 使用lazy_static创建一个全局静态的服务器到服务器池，用于存储服务器间的消息处理对象。
 lazy_static! {
     // key: 目标服务器的ID，Value: 元组（链接，接收流，发送流）
@@ -118,6 +120,7 @@ impl EXServer {
             ims_rct_queue,
         }
     }
+
 }
 
 // 异步函数，用于将一个S2SMessageProcess实例放入全局池中。

@@ -25,7 +25,7 @@ pub async fn start_send_message_queue_server(
     let buffer = buffer.clone();
     let server_handle = tokio::spawn(async move {
         let receiver = snd_queue.get_receiver();
-        let mut meqrece = receiver.lock().await;
+        let mut meqrece = receiver.write().await;
         while let Some(event) = meqrece.recv().await {
             match event {
                 // 处理消息接收事件

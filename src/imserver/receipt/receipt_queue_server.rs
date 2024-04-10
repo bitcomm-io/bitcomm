@@ -22,7 +22,7 @@ pub async fn start_receipt_queue_server(
     // 获取消息事件队列的接收端
     let server_handle = tokio::spawn(async move {
         let receiver = rct_queue.get_receiver();
-        let mut meqrece = receiver.lock().await;
+        let mut meqrece = receiver.write().await;
         while let Some(event) = meqrece.recv().await {
             match event {
                 // 处理消息接收事件

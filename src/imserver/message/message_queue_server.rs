@@ -19,7 +19,7 @@ pub async fn start_message_queue_server(
     let snd_queue = snd_queue.clone();
     let server_handle = tokio::spawn(async move {
         let receiver = msg_queue.get_receiver();
-        let mut meqrece = receiver.lock().await;
+        let mut meqrece = receiver.write().await;
         while let Some(event) = meqrece.recv().await {
             match event {
                 // 处理消息接收事件
@@ -55,7 +55,7 @@ pub async fn put_send_message_queue(
     snd_queue: &Arc<BitcommGramQueue>
 ) {
     let sender = snd_queue.get_sender();
-    let msgevent = sender.lock().await;
+    let msgevent = sender.clone();
     msgevent
         .send(GramEvent::MessagGramEvent {
             data_buff: data_buff.clone(),

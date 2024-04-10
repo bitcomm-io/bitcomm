@@ -86,7 +86,7 @@ async fn send_message_to_queue(
     queue: &Arc<BitcommGramQueue>
 ) {
     let sender = queue.get_sender();
-    let msgevent = sender.lock().await;
+    let msgevent = sender.clone();
     msgevent
         .send(GramEvent::MessagGramEvent {
             data_buff: data_buff.clone(),

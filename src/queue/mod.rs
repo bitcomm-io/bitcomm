@@ -5,7 +5,7 @@ use std::sync::Arc;
 // use btcmbase::datagram::MessageDataGram;
 use bytes::Bytes;
 use getset::{CopyGetters, Setters};
-use tokio::sync::{mpsc::{self, Receiver, Sender}, Mutex};
+use tokio::sync::{mpsc::{self, Receiver, Sender}, Mutex, RwLock};
 // use tokio::sync::{mpsc::{self, Receiver, Sender}, Mutex};
 
 use crate::object::gram::{hookup::S2SHookupGram, message::MessageGram, receipt::ReceiptGram};
@@ -25,10 +25,10 @@ pub struct BitcommGramQueue {
     queue_size  :   usize,
     // 队列发送端
     // #[getset(set = "pub", get = "pub")]
-    sender      :   Arc<Mutex<Sender<GramEvent>>>,
+    sender      :   Sender<GramEvent>,
     // 队列接收端。
     // #[getset(set = "pub", get = "pub")]
-    receiver    :   Arc<Mutex<Receiver<GramEvent>>>,
+    receiver    :   Arc<RwLock<Receiver<GramEvent>>>,
 }
 
 impl BitcommGramQueue {
@@ -37,17 +37,17 @@ impl BitcommGramQueue {
         let (s, r) = mpsc::channel::<GramEvent>(queue_size);
         BitcommGramQueue {
             queue_size,
-            sender      : Arc::new(Mutex::new(s)),
-            receiver    : Arc::new(Mutex::new(r)),
+            sender      : s,
+            receiver    : Arc::new(RwLock::new(r)),
         }
     }
     //
-    pub fn get_sender(&self) -> Arc<Mutex<Sender<GramEvent>>> {
-        self.sender.clone()
+    pub fn get_sender(&self) -> &Sender<GramEvent> {
+        &self.sender
     }
     /// 获取消息接收端。
-    pub fn get_receiver(&self) -> Arc<Mutex<Receiver<GramEvent>>> {
-        self.receiver.clone()
+    pub fn get_receiver(&self) -> &Arc<RwLock<Receiver<GramEvent>>> {
+        &self.receiver
     }
 }
 
