@@ -25,7 +25,7 @@ pub async fn process_hookup<'a>(
     let mut exs = exserver.write().await;
     // 谁发过来的，谁是远程ID
     exs.set_remote_server_id(data_gram.send_server_id());
-    exs.set_local_server_id(crate::SERVER_GUID.to_le());
+    exs.set_local_server_id(crate::server::SERVER_GUID.to_le());
     // 如果Hookup成功，则放入
     exserver::put_s2s_msp(exserver).await;
     //
@@ -42,7 +42,7 @@ async fn send_hookup_reply(data_gram: &Arc<S2SHookupGram>, stm: &Arc<Mutex<SendS
     rct_gram.set_version(data_gram.version());
     rct_gram.set_command(data_gram.command() | BitCommand::RESP_MASK);
     // 发送者变更为本机ID
-    rct_gram.set_send_server_id(crate::SERVER_GUID.to_le());
+    rct_gram.set_send_server_id(crate::server::SERVER_GUID.to_le());
     // 谁发过来的谁是
     rct_gram.set_recv_server_id(data_gram.send_server_id());
     rct_gram.set_message_type(data_gram.message_type());

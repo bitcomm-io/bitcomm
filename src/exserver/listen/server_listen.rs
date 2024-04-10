@@ -33,7 +33,7 @@ pub async fn server_message_listening_server(
                 let send_stream = Arc::new(Mutex::new(send_stream));
                 let rece_stream = Arc::new(Mutex::new(rece_stream));
                 let connection = Arc::new(connection);
-                let local_server_id = crate::SERVER_GUID.to_le();
+                let local_server_id = crate::server::SERVER_GUID.to_le();
                 // 初始化EXServer
                 let exserver = receive::init_exserver(
                     &send_stream,

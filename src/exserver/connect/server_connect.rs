@@ -24,7 +24,7 @@ pub async fn connect_exchange_server(
     let send_stream = Arc::new(Mutex::new(send_stream));
     let rece_stream = Arc::new(Mutex::new(rece_stream));
     let connection = Arc::new(connection);
-    let local_server_id = crate::SERVER_GUID.to_le();
+    let local_server_id = crate::server::SERVER_GUID.to_le();
     // 初始化EXServer
     let exserver = receive::init_exserver(
         &send_stream,
@@ -53,7 +53,7 @@ async fn send_hookup(stm: Arc<Mutex<SendStream>>) {
     rct_gram.set_bitcomm(BitcommFlag::BITCOMM_HOOKUP);
     rct_gram.set_version(BitcommVersion::BITCOMM_VERSION_0_1_0_1);
     rct_gram.set_command(BitCommand::HOOKUP_SERVER);
-    rct_gram.set_send_server_id(crate::SERVER_GUID.to_le());
+    rct_gram.set_send_server_id(crate::server::SERVER_GUID.to_le());
     rct_gram.set_recv_server_id(0);
     // rct_gram.set_message_type();
     // rct_gram.set_message_id(0);
