@@ -15,7 +15,7 @@ use crate::queue::{GramBufferPool, BitcommGramQueue};
 pub async fn process_receipt_gram<'a>(
     reqmsgbuff: &Arc<Bytes>,
     reqmsggram: &Arc<ReceiptGram>,
-    stm: Arc<tokio::sync::Mutex<SendStream>>,
+    stm: &Arc<tokio::sync::Mutex<SendStream>>,
     rct_queue: &Arc<BitcommGramQueue>
 ) {
     client_receipt2queue::send_client_receipt_to_queue(

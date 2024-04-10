@@ -7,7 +7,7 @@ pub mod reply;
 use bitflags::bitflags;
 // use bitflags::Flags;
 // use bytes::BytesMut;
-use getset::{Getters, Setters};
+use getset::{ Getters, Setters };
 // use std::cell::RefCell;
 use std::error;
 use std::fmt;
@@ -83,12 +83,16 @@ bitflags! {
 
 fn get_gram_by_u8<'a, T>(gram_buf: &[u8]) -> &'a T {
     // 将字节切片转换为对 T 类型的引用
-    unsafe { &*(gram_buf[0..].as_ptr() as *const T) }
+    unsafe {
+        &*(gram_buf[0..].as_ptr() as *const T)
+    }
     // unsafe { & *(gram_buf.as_ptr() as *const T) }
 }
 fn get_mut_gram_by_u8<'a, T>(gram_buf: &mut [u8]) -> &'a mut T {
     // 将字节切片转换为对 T 类型的引用
-    unsafe { &mut *(gram_buf[0..].as_mut_ptr() as *mut T) }
+    unsafe {
+        &mut *(gram_buf[0..].as_mut_ptr() as *mut T)
+    }
     // unsafe { & *(gram_buf.as_mut_ptr() as *mut T) }
 }
 

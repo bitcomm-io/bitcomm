@@ -15,7 +15,7 @@ use crate::queue::BitcommGramQueue;
 pub async fn process_message_gram<'a>(
     reqmsgbuff: &Arc<Bytes>,
     reqmsggram: &Arc<MessageGram>,
-    stm: Arc<Mutex<SendStream>>,
+    stm: &Arc<Mutex<SendStream>>,
     queue: &Arc<BitcommGramQueue>
 ) {
     server_message2queue::send_server_message_to_queue(reqmsgbuff, reqmsggram, stm,queue).await;

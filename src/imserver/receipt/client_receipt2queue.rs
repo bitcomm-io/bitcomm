@@ -19,7 +19,7 @@ use crate::{
 pub async fn send_client_receipt_to_queue(
     data_buff: &Arc<Bytes>,
     data_gram: &Arc<ReceiptGram>,
-    stm: Arc<Mutex<SendStream>>,
+    stm: &Arc<Mutex<SendStream>>,
     rct_queue: &Arc<BitcommGramQueue>
 ) -> Option<Arc<ReceiptGram>> {
     //
@@ -52,7 +52,7 @@ pub async fn send_client_receipt_to_queue(
 }
 
 //
-async fn send_client_receipt_reply(data_gram: &Arc<ReceiptGram>, stm: Arc<Mutex<SendStream>>) {
+async fn send_client_receipt_reply(data_gram: &Arc<ReceiptGram>, stm: &Arc<Mutex<SendStream>>) {
     // 如果当前接收是在ListenServer中，则需要发送反馈信息
     let rct_buff = get_reply_buff(data_gram);
     // 直接发送

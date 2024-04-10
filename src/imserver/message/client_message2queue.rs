@@ -24,7 +24,7 @@ use crate::{
 pub async fn send_client_message_to_queue(
     data_buff: &Arc<Bytes>,
     data_gram: &Arc<MessageGram>,
-    stm: Arc<Mutex<SendStream>>,
+    stm: &Arc<Mutex<SendStream>>,
     queue: &Arc<BitcommGramQueue>
 ) -> Option<Arc<MessageGram>> {
     //
@@ -54,7 +54,7 @@ pub async fn send_client_message_to_queue(
     Some(data_gram.clone())
 }
 
-async fn send_client_message_reply(data_gram: &Arc<MessageGram>, stm: Arc<Mutex<SendStream>>) {
+async fn send_client_message_reply(data_gram: &Arc<MessageGram>, stm: &Arc<Mutex<SendStream>>) {
     // 如果当前接收是在ListenServer中，则需要发送反馈信息
     let rct_buff = get_reply_buff(data_gram);
     // 直接发送
@@ -95,7 +95,7 @@ async fn send_message_to_queue(
         .expect("send event error!");
 }
 //
-async fn send_message_notlogin(reqmsggram: &Arc<MessageGram>, stm: Arc<Mutex<SendStream>>) {
+async fn send_message_notlogin(reqmsggram: &Arc<MessageGram>, stm: &Arc<Mutex<SendStream>>) {
     let mut vecu8 = CommandGram::create_gram_buf(0);
     let cdg = CommandGram::create_command_gram_from_message_gram(
         vecu8.as_mut(),
@@ -110,7 +110,7 @@ async fn send_message_notlogin(reqmsggram: &Arc<MessageGram>, stm: Arc<Mutex<Sen
 //
 async fn send_message_twosession_nosame(
     reqmsggram: &Arc<MessageGram>,
-    stm: Arc<Mutex<SendStream>>
+    stm: &Arc<Mutex<SendStream>>
 ) {
     let mut vecu8 = CommandGram::create_gram_buf(0);
     let cdg = CommandGram::create_command_gram_from_message_gram(

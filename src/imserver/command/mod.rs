@@ -16,7 +16,7 @@ use crate::object::gram::{
 pub async fn process_command_data<'a>(
     reqcmdbuff: &Arc<Bytes>,
     reqcmdgram: &Arc<CommandGram>,
-    stm: Arc<tokio::sync::Mutex<SendStream>>,
+    stm: &Arc<tokio::sync::Mutex<SendStream>>,
 ) {
     match reqcmdgram.command() {
         BitCommand::LOGIN_COMMAND => {
@@ -33,7 +33,7 @@ pub async fn process_command_data<'a>(
 //
 pub async fn process_pingpong<'a>(
     pingpong: &Arc<BitcommFlag>,
-    stm: Arc<tokio::sync::Mutex<SendStream>>,
+    stm: &Arc<tokio::sync::Mutex<SendStream>>,
 ) {
     pingpong::process_pingpong(pingpong, stm).await;
 }

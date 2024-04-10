@@ -19,7 +19,7 @@ pub static REMOVE_BUFFER_TIME: u64 = 5;
 pub async fn process_message_gram<'a>(
     reqmsgbuff: &Arc<Bytes>,
     reqmsggram: &Arc<MessageGram>,
-    stm: Arc<tokio::sync::Mutex<SendStream>>,
+    stm: &Arc<tokio::sync::Mutex<SendStream>>,
     queue: &Arc<BitcommGramQueue>
 ) {
     client_message2queue::send_client_message_to_queue(reqmsgbuff, reqmsggram, stm, queue).await;

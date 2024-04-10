@@ -52,7 +52,7 @@ pub fn get_server(server:&str,port:&str) -> Result<Server, Box<dyn Error>> {
     Ok(server)
 }
 // 
-pub async fn get_client(server: &str, port: &str) -> Result<Connection, Box<dyn Error>> {
+pub async fn get_client(server: &str, port: &str) -> Result<(Client,Connection), Box<dyn Error>> {
     let client = Client::builder()
         .with_tls(CERT_PEM)?
         // 使用指定的 PEM 证书配置 TLS
@@ -65,5 +65,5 @@ pub async fn get_client(server: &str, port: &str) -> Result<Connection, Box<dyn 
     let mut connection = client.connect(connect).await?;
     // 确保连接不会因不活动而超时
     connection.keep_alive(true)?;
-    Result::Ok(connection)
+    Result::Ok((client,connection))
 }

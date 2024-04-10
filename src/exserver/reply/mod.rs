@@ -1,29 +1,33 @@
 use bytes::Bytes;
 use s2n_quic::stream::SendStream;
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 use tracing::info;
 
 use std::sync::Arc;
 
-use crate::{ exserver::S2SMSPType, object::gram::reply::ReplyGram };
+use crate::{ exserver::S2SMSPType, object::gram::reply::ReplyGram, queue::GramBufferPool };
 
-use super::queue::RESEND_BUFFER_2_SERVER;
+use super::EXServer;
+
 
 //
 pub async fn process_reply<'a>(
     _data_buff: &Arc<Bytes>,
     data_gram: &Arc<ReplyGram>,
-    _stm: Arc<Mutex<SendStream>>,
-    _s2smsp_type:S2SMSPType
+    _stm: &Arc<Mutex<SendStream>>,
+    _s2smsp_type:&S2SMSPType,
+    exserver:&Arc<RwLock<EXServer>>,
 ) {
     // 记录日志
     info!("server hookup server {:?}", data_gram);
+    let mb = exserver.write().await;
+    let message_buffer = mb.resend_buffer();
     //
-    remove_buffer(data_gram).await;
+    remove_buffer(message_buffer,data_gram).await;
 }
 //
-async fn remove_buffer(data_gram: &Arc<ReplyGram>) {
+async fn remove_buffer(message_buffer: &Arc<RwLock<GramBufferPool>>,data_gram: &Arc<ReplyGram>) {
     let key = data_gram.get_reply_gram_key();
-    let mut buffer = RESEND_BUFFER_2_SERVER.write().await;
+    let mut buffer = message_buffer.write().await;
     buffer.remove(&key);
 }

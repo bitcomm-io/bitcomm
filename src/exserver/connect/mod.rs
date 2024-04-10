@@ -1,26 +1,26 @@
 use std::sync::Arc;
 
-use s2n_quic::Connection;
-// use tokio::task::JoinHandle;
+
+use tokio::sync::RwLock;
 
 use crate::{object::BITServerID, queue::BitcommGramQueue};
 
-pub mod conn2server;
+use super::EXServer;
+
+pub mod server_connect;
 
 pub async fn connect_exchange_server(
-    local_server:BITServerID,
-    remote_server:BITServerID,
+    local_server_id: BITServerID,
     server: &str,
     port: &str,
-    msg_queue: &Arc<BitcommGramQueue>,
-    rct_queue: &Arc<BitcommGramQueue>
-) -> Arc<Connection> {
-    conn2server::connect_exchange_server(
-        local_server,
-        remote_server,
+    ims_msg_queue: Arc<BitcommGramQueue>,
+    ims_rct_queue: Arc<BitcommGramQueue>
+) -> Arc<RwLock<EXServer>> {
+    server_connect::connect_exchange_server(
+        local_server_id,
         server,
         port,
-        msg_queue,
-        rct_queue
+        ims_msg_queue,
+        ims_rct_queue
     ).await
 }

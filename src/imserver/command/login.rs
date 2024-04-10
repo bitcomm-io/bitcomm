@@ -23,7 +23,7 @@ use crate::object::gram::command::CommandGram;
 pub async fn process_command_login<'a>(
     reqcmdbuff: &Arc<Bytes>,
     reqcmdgram: &Arc<CommandGram>,
-    stm: Arc<tokio::sync::Mutex<SendStream>>,
+    stm: &Arc<tokio::sync::Mutex<SendStream>>,
 ) {
     // 记录日志
     info!("client login server {:?}", reqcmdgram);

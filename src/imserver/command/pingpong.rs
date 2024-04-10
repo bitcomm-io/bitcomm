@@ -16,7 +16,7 @@ const PINGPONG_CODE: u32 = 0x000A;
 #[allow(unused_variables)]
 pub async fn process_pingpong<'a>(
     pingpong: &Arc<BitcommFlag>,
-    stm: Arc<tokio::sync::Mutex<SendStream>>,
+    stm: &Arc<tokio::sync::Mutex<SendStream>>,
 ) {
     let mut stream = stm.lock().await;
     if let Ok(address) = stream.connection().remote_addr() {

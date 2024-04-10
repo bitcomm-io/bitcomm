@@ -15,16 +15,16 @@ use crate::{ object::gram::{message::MessageGram, reply::ReplyGram, BitCommand, 
 pub async fn send_server_message_to_queue(
     data_buff: &Arc<Bytes>,
     data_gram: &Arc<MessageGram>,
-    stm: Arc<Mutex<SendStream>>,
+    stm: &Arc<Mutex<SendStream>>,
     queue: &Arc<BitcommGramQueue>
-) -> Option<Arc<MessageGram>> {
+) {
     //
     info!("client send message gram to server {:?}", data_gram);
     // 
     send_message_to_queue(data_buff, data_gram, queue).await;
     // send reply receipt
     send_server_message_reply(data_gram,stm).await;
-    Some(data_gram.clone())
+    // Some(data_gram.clone())
 }
 //
 async fn send_message_to_queue(
@@ -42,7 +42,7 @@ async fn send_message_to_queue(
         .expect("send event error!");
 }
 //
-async fn send_server_message_reply(data_gram: &Arc<MessageGram>, stm: Arc<Mutex<SendStream>>) {
+async fn send_server_message_reply(data_gram: &Arc<MessageGram>, stm: &Arc<Mutex<SendStream>>) {
     // 如果当前接收是在ListenServer中，则需要发送反馈信息
     let rct_buff = get_reply_buff(data_gram);
     // 直接发送

@@ -38,7 +38,7 @@ pub async fn client_message_listening_server (
                     let rct_queue = rct_queue.clone(); 
                     tokio::spawn(async move {
                         // 进入接收数据过程
-                        receive::client_data::receive_data_gram(receive_stream, stm0,&msg_queue,&rct_queue).await;
+                        receive::client_data::receive_data_gram(receive_stream, &stm0,&msg_queue,&rct_queue).await;
                         // 在此需要清理IP->ClientID+DeviceID信息
                     });
                 }
