@@ -30,7 +30,7 @@ pub async fn start_exserver_send_server(
         while let Some(event) = meqrece.recv().await {
             match event {
                 // 处理消息接收事件
-                GramEvent::MessagGramEvent { data_buff, data_gram } => {
+                GramEvent::MessageGramEvent { data_buff, data_gram } => {
                     buffer::send_message2buffer(&message_buffer, &data_buff, &data_gram).await;
                     send_message2server(&exserver,&data_buff, &data_gram).await;
                 }
@@ -123,7 +123,7 @@ pub async fn put_message_gram_to_queue(
     let sender = message_queue.get_sender().clone();
     // let msgevent = sender.lock().await;
     sender
-        .send(GramEvent::MessagGramEvent {
+        .send(GramEvent::MessageGramEvent {
             data_buff: data_buff.clone(),
             data_gram: data_gram.clone(),
         }).await

@@ -29,7 +29,7 @@ pub async fn start_send_message_queue_server(
         while let Some(event) = meqrece.recv().await {
             match event {
                 // 处理消息接收事件
-                GramEvent::MessagGramEvent { data_buff, data_gram } => {
+                GramEvent::MessageGramEvent { data_buff, data_gram } => {
                     // 发送到正在发送缓冲池
                     send2buffer(&buffer,&data_buff, &data_gram).await;
                     // 发送到客户端

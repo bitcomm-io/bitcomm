@@ -35,7 +35,7 @@ async fn send_message_to_queue(
     let sender = queue.get_sender();
     let msgevent = sender.clone();
     msgevent
-        .send(GramEvent::MessagGramEvent {
+        .send(GramEvent::MessageGramEvent {
             data_buff: data_buff.clone(),
             data_gram: data_gram.clone(),
         }).await

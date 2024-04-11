@@ -32,6 +32,9 @@ use crate::queue::BitcommGramQueue;
 use crate::queue::GramBufferPool;
 use crate::queue::EVENT_QUEUE_LEN;
 
+use self::connect::server_connect;
+use self::listen::server_listen;
+
 // use self::receive::server_data;
 
 // 使用lazy_static创建一个全局静态的服务器到服务器池，用于存储服务器间的消息处理对象。
@@ -139,4 +142,32 @@ pub async fn remove_s2s_msp(remote_server_id: BITServerID) -> Option<Arc<RwLock<
 pub async fn get_s2s_msp(remote_server_id: BITServerID) -> Option<Arc<RwLock<EXServer>>> {
     let s2s_p = SERVER_2_SERVER_POOL.read().await;
     s2s_p.get(&remote_server_id).map(|x| x.clone())
+}
+
+
+
+
+
+
+pub async fn connect_exchange_server(
+    server: &str,
+    port: &str,
+    ims_msg_queue: Arc<BitcommGramQueue>,
+    ims_rct_queue: Arc<BitcommGramQueue>
+) -> Arc<RwLock<EXServer>> {
+    server_connect::connect_exchange_server(
+        server,
+        port,
+        ims_msg_queue,
+        ims_rct_queue
+    ).await
+}
+
+pub async fn listening_exchange_server(
+    server_address: String,
+    server_port: String,
+    msg_queue: Arc<BitcommGramQueue>,
+    rct_queue: Arc<BitcommGramQueue>
+) -> Arc<tokio::task::JoinHandle<()>> {
+    server_listen::listening_exchange_server( server_address, server_port, msg_queue, rct_queue).await
 }

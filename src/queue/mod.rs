@@ -1,8 +1,6 @@
-// pub mod grambuffer;
 
 use std::sync::Arc;
 
-// use btcmbase::datagram::MessageDataGram;
 use bytes::Bytes;
 use getset::{CopyGetters, Setters};
 use tokio::sync::{mpsc::{self, Receiver, Sender}, RwLock};
@@ -24,10 +22,8 @@ pub struct BitcommGramQueue {
     #[getset(set = "pub", get = "pub")]
     queue_size  :   usize,
     // 队列发送端
-    // #[getset(set = "pub", get = "pub")]
     sender      :   Sender<GramEvent>,
     // 队列接收端。
-    // #[getset(set = "pub", get = "pub")]
     receiver    :   Arc<RwLock<Receiver<GramEvent>>>,
 }
 
@@ -54,7 +50,7 @@ impl BitcommGramQueue {
 /// 事件类型枚举。
 #[allow(dead_code)]
 pub enum GramEvent {
-    MessagGramEvent {
+    MessageGramEvent {
         data_buff: Arc<Bytes>,
         data_gram: Arc<MessageGram>,
     },
@@ -74,7 +70,7 @@ pub struct GramBufferPool {
     #[getset(set = "pub", get = "pub")]
     buffer: VecDeque<u128>,
     #[getset(set = "pub", get = "pub")]
-    hashsto: HashMap<u128, Arc<Bytes>>,
+    table: HashMap<u128, Arc<Bytes>>,
     #[getset(set = "pub", get = "pub")]
     capacity: usize,
 }
@@ -84,7 +80,7 @@ impl GramBufferPool {
     pub fn new(capacity: usize) -> Self {
         GramBufferPool {
             buffer: VecDeque::with_capacity(capacity),
-            hashsto: HashMap::with_capacity(capacity),
+            table: HashMap::with_capacity(capacity),
             capacity,
         }
     }
@@ -97,20 +93,19 @@ impl GramBufferPool {
         }
         // let key = gram.get_message_gram_key();
         self.buffer.push_back(key);
-        self.hashsto.insert(key, data);
+        self.table.insert(key, data);
     }
 
     // 从缓冲池中获取数据（按照先进先出的顺序）
     pub fn pop(&mut self) -> Option<Arc<Bytes>> {
         if let Some(key) = self.buffer.pop_front() {
-            self.hashsto.remove(&key)
-            // self.hashsto.get(&key).map(|x| x.clone())
+            self.table.remove(&key)
         } else {
             None
         }
     }
     pub fn remove(&mut self, key: &u128) -> Option<Arc<Bytes>> {
-        self.hashsto.remove(key)
+        self.table.remove(key)
     }
     pub fn get_buffer_size(&self) -> usize {
         self.buffer.len()

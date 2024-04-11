@@ -8,7 +8,7 @@ use crate::{ exserver::{ queue, S2SMSPType }, queue::BitcommGramQueue };
 use crate::{ exserver::receive::{ self, server_data }, net::quic::qcutils };
 
 //
-pub async fn server_message_listening_server(
+pub async fn listening_exchange_server(
     server_address: String,
     server_port: String,
     ims_msg_queue: Arc<BitcommGramQueue>,

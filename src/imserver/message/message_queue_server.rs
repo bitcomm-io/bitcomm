@@ -23,7 +23,7 @@ pub async fn start_message_queue_server(
         while let Some(event) = meqrece.recv().await {
             match event {
                 // 处理消息接收事件
-                GramEvent::MessagGramEvent { data_buff, data_gram } => {
+                GramEvent::MessageGramEvent { data_buff, data_gram } => {
                     // 存入收件箱
                     // save_to_inbox();
                     // 判断服务器类型，如果不是同一个服务器，则需要转发
@@ -57,7 +57,7 @@ pub async fn put_send_message_queue(
     let sender = snd_queue.get_sender();
     let msgevent = sender.clone();
     msgevent
-        .send(GramEvent::MessagGramEvent {
+        .send(GramEvent::MessageGramEvent {
             data_buff: data_buff.clone(),
             data_gram: data_gram.clone(),
         }).await
