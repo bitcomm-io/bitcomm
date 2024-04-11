@@ -30,7 +30,9 @@ pub fn init_exserver(
     exserver
 }
 //
-pub async fn start_exserver_receive_server(exserver:&Arc<RwLock<EXServer>>,) -> Arc<RwLock<EXServer>> {
+pub async fn start_exserver_receive_server(
+    exserver: &Arc<RwLock<EXServer>>
+) -> Arc<RwLock<EXServer>> {
     let mut set_server = exserver.write().await;
     let rece_stream = set_server.rece_stream().clone();
     let send_stream = set_server.send_stream().clone();
@@ -50,6 +52,6 @@ pub async fn start_exserver_receive_server(exserver:&Arc<RwLock<EXServer>>,) -> 
         ).await;
     });
     set_server.set_rece_task(Some(Arc::new(handle)));
-    
+
     exserver.clone()
 }
