@@ -5,7 +5,7 @@ use tokio::sync::{ Mutex, RwLock };
 
 use crate::queue::BitcommGramQueue;
 
-use super::{ EXServer, S2SMSPType };
+use super::{ EXServer, ServiceType };
 
 pub mod server_data;
 
@@ -13,7 +13,7 @@ pub fn init_exserver(
     send_stream: &Arc<Mutex<SendStream>>,
     rece_stream: &Arc<Mutex<ReceiveStream>>,
     connection: &Arc<Connection>,
-    s2smsp_type: &S2SMSPType,
+    s2smsp_type: &ServiceType,
     local_server_id: u32,
     ims_msg_queue: &Arc<BitcommGramQueue>,
     ims_rct_queue: &Arc<BitcommGramQueue>

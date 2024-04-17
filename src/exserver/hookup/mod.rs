@@ -5,7 +5,7 @@ use tracing::info;
 
 use std::sync::Arc;
 
-use crate::{ exserver::{ self, S2SMSPType }, object::gram::{ hookup::S2SHookupGram, BitCommand } };
+use crate::{ exserver::{ self, ServiceType }, object::gram::{ hookup::S2SHookupGram, BitCommand } };
 
 use super::EXServer;
 
@@ -17,7 +17,7 @@ pub async fn process_hookup<'a>(
     _data_buff: &Arc<Bytes>,
     data_gram: &Arc<S2SHookupGram>,
     stm: &Arc<Mutex<SendStream>>,
-    s2smsp_type: &S2SMSPType,
+    s2smsp_type: &ServiceType,
     exserver:&Arc<RwLock<EXServer>>,
 ) {
     // 记录日志
@@ -29,7 +29,7 @@ pub async fn process_hookup<'a>(
     // 如果Hookup成功，则放入
     exserver::put_s2s_msp(exserver).await;
     //
-    if let S2SMSPType::Server = s2smsp_type {
+    if let ServiceType::Server = s2smsp_type {
         send_hookup_reply(data_gram, stm).await;
     }
 }

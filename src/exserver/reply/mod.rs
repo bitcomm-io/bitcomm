@@ -5,7 +5,7 @@ use tracing::info;
 
 use std::sync::Arc;
 
-use crate::{ exserver::S2SMSPType, object::gram::reply::ReplyGram, queue::GramBufferPool };
+use crate::{ exserver::ServiceType, object::gram::reply::ReplyGram, queue::GramBufferPool };
 
 use super::EXServer;
 
@@ -15,7 +15,7 @@ pub async fn process_reply<'a>(
     _data_buff: &Arc<Bytes>,
     data_gram: &Arc<ReplyGram>,
     _stm: &Arc<Mutex<SendStream>>,
-    _s2smsp_type:&S2SMSPType,
+    _s2smsp_type:&ServiceType,
     exserver:&Arc<RwLock<EXServer>>,
 ) {
     // 记录日志

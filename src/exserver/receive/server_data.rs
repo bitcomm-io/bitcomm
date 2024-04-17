@@ -8,7 +8,7 @@ use tokio::sync::{Mutex, RwLock};
 use crate::object::gram::hookup::S2SHookupGram;
 use crate::object::gram::reply::ReplyGram;
 use crate::queue::BitcommGramQueue;
-use crate::exserver::{ hookup, message, receipt, reply, EXServer, S2SMSPType };
+use crate::exserver::{ hookup, message, receipt, reply, EXServer, ServiceType };
 use crate::object::gram::message::MessageGram;
 use crate::object::gram::receipt::ReceiptGram;
 use crate::object::gram::BitcommDataGram;
@@ -32,7 +32,7 @@ pub async fn receive_data_gram(
     send_stream: Arc<Mutex<SendStream>>,
     msg_queue: Arc<BitcommGramQueue>,
     rct_queue: Arc<BitcommGramQueue>,
-    s2smsp_type: S2SMSPType,
+    s2smsp_type: ServiceType,
     exserver:Arc<RwLock<EXServer>>,
 ) {
     // 接收数据并处理
@@ -164,7 +164,7 @@ pub async fn send_receipt_2_client(data: Arc<BitcommDataGram>, _stm: Arc<Mutex<S
 pub async fn process_server_command(
     data: &Arc<BitcommDataGram>,
     stm: &Arc<Mutex<SendStream>>,
-    s2smsp_type: &S2SMSPType,
+    s2smsp_type: &ServiceType,
     exserver:&Arc<RwLock<EXServer>>,
 ) {
     match data.as_ref() {
