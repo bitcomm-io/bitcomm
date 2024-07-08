@@ -32,7 +32,7 @@ use crate::queue::BitcommGramQueue;
 use crate::queue::GramBufferPool;
 use crate::queue::EVENT_QUEUE_LEN;
 
-use self::connect::server_connect;
+use self::connect::connect_server;
 use self::listen::server_listen;
 
 // use self::receive::server_data;
@@ -155,7 +155,7 @@ pub async fn connect_exchange_server(
     ims_msg_queue: Arc<BitcommGramQueue>,
     ims_rct_queue: Arc<BitcommGramQueue>
 ) -> Arc<RwLock<EXServer>> {
-    server_connect::connect_exchange_server(
+    connect_server::connect_exchange_server(
         server,
         port,
         ims_msg_queue,
