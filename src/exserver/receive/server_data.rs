@@ -8,7 +8,7 @@ use tokio::sync::{Mutex, RwLock};
 use crate::object::gram::hookup::S2SHookupGram;
 use crate::object::gram::reply::ReplyGram;
 use crate::queue::BitcommGramQueue;
-use crate::exserver::{ hookup, message, receipt, reply, EXServer, ServiceType };
+use crate::exserver::{ hookup, message, receipt, reply, EXServer, EXServerType };
 use crate::object::gram::message::MessageGram;
 use crate::object::gram::receipt::ReceiptGram;
 use crate::object::gram::BitcommDataGram;
@@ -20,7 +20,7 @@ use crate::object::gram::BitcommDataGram;
 /// * `stm0` - 发送数据的流的互斥锁包装的`Arc`。
 /// * `msg_queue` - 消息队列的`Arc`。
 /// * `rct_queue` - 回执队列的`Arc`。
-/// * `s2smsp_type` - 服务器到服务器消息处理类型。
+/// * `exserver_type` - 服务器到服务器消息处理类型。
 ///
 /// # 示例
 ///
@@ -32,7 +32,7 @@ pub async fn receive_data_gram(
     send_stream: Arc<Mutex<SendStream>>,
     msg_queue: Arc<BitcommGramQueue>,
     rct_queue: Arc<BitcommGramQueue>,
-    s2smsp_type: ServiceType,
+    exserver_type: EXServerType,
     exserver:Arc<RwLock<EXServer>>,
 ) {
     // 接收数据并处理
@@ -47,7 +47,7 @@ pub async fn receive_data_gram(
             process_server_command(
                     &rc_data_gram,
                     &send_stream,
-                    &s2smsp_type,
+                    &exserver_type,
                     &exserver
                 ).await;
             // 处理消息
@@ -150,7 +150,7 @@ pub async fn send_receipt_2_client(data: Arc<BitcommDataGram>, _stm: Arc<Mutex<S
 /// # 参数
 /// * `data` - 要处理的数据报文的`Arc`。
 /// * `stm` - 发送数据的流的互斥锁包装的`Arc`。
-/// * `s2smsp_type` - 服务器到服务器消息处理类型。
+/// * `exserver_type` - 服务器到服务器消息处理类型。
 ///
 /// # 返回
 /// 返回`Result<Arc<BitcommDataGram>, DataGramError>`，表示处理结果。
@@ -164,16 +164,16 @@ pub async fn send_receipt_2_client(data: Arc<BitcommDataGram>, _stm: Arc<Mutex<S
 pub async fn process_server_command(
     data: &Arc<BitcommDataGram>,
     stm: &Arc<Mutex<SendStream>>,
-    s2smsp_type: &ServiceType,
+    exserver_type: &EXServerType,
     exserver:&Arc<RwLock<EXServer>>,
 ) {
     match data.as_ref() {
         // 处理命令
         BitcommDataGram::S2SHookup { data_buff, data_gram } =>
-            hookup::process_hookup(data_buff, data_gram, stm, s2smsp_type,exserver).await,
+            hookup::process_hookup(data_buff, data_gram, stm, exserver_type,exserver).await,
         // 应答信息包
         BitcommDataGram::Reply { data_buff, data_gram } =>
-            reply::process_reply(data_buff, data_gram, stm, s2smsp_type,exserver).await,
+            reply::process_reply(data_buff, data_gram, stm, exserver_type,exserver).await,
         _ => {}
     }
 }

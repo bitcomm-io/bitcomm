@@ -3,7 +3,7 @@ use s2n_quic::stream::SendStream;
 use tokio::{ io::AsyncWriteExt, sync::{ Mutex, RwLock } };
 
 use crate::{
-    exserver::{ queue, receive, EXServer, ServiceType },
+    exserver::{ queue, receive, EXServer, EXServerType },
     net::quic::qcutils,
     object::gram::{ hookup::S2SHookupGram, BitCommand, BitcommFlag, BitcommVersion },
     queue::BitcommGramQueue,
@@ -30,7 +30,7 @@ pub async fn connect_exchange_server(
         &send_stream,
         &rece_stream,
         &connection,
-        &ServiceType::Client,
+        &EXServerType::Client,
         local_server_id,
         &ims_msg_queue,
         &ims_rct_queue

@@ -45,9 +45,9 @@ lazy_static! {
 
 // 定义一个枚举类型，表示服务器到服务器消息处理的类型。
 #[derive(Debug, Clone)]
-pub enum ServiceType {
+pub enum EXServerType {
     Client, // 客户端连接模式
-    Server, // 服务端连接模式
+    Server, // 服务端监听模式
 }
 
 // 定义一个与C语言兼容的结构体，用于服务器间消息处理。
@@ -56,7 +56,7 @@ pub enum ServiceType {
 pub struct EXServer {
     // 消息处理类型
     #[getset(get = "pub")]
-    s2smsp_type: ServiceType,
+    exserver_type: EXServerType,
     // 当前服务器ID
     #[getset(set = "pub", get = "pub")]
     local_server_id: BITServerID,
@@ -99,7 +99,7 @@ pub struct EXServer {
 impl EXServer {
     // 构造函数，用于创建一个新的S2SMessageProcess实例。
     pub fn new(
-        s2smsp_type: ServiceType,
+        exserver_type: EXServerType,
         local_server_id: BITServerID,
         ims_msg_queue: Arc<BitcommGramQueue>,
         ims_rct_queue: Arc<BitcommGramQueue>,
@@ -108,7 +108,7 @@ impl EXServer {
         rece_stream: Arc<Mutex<ReceiveStream>>
     ) -> Self {
         EXServer {
-            s2smsp_type,
+            exserver_type,
             local_server_id,
             remote_server_id:0,
             sendmsg_queue: Arc::new(BitcommGramQueue::new(EVENT_QUEUE_LEN)),

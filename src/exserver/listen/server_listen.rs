@@ -3,7 +3,7 @@ use std::sync::Arc;
 use tokio::sync::{ Mutex, RwLock };
 
 // use tracing::info;
-use crate::{ exserver::{ queue, ServiceType }, queue::BitcommGramQueue };
+use crate::{ exserver::{ queue, EXServerType }, queue::BitcommGramQueue };
 #[allow(unused_imports)]
 use crate::{ exserver::receive::{ self, server_data }, net::quic::qcutils };
 
@@ -39,7 +39,7 @@ pub async fn listening_exchange_server(
                     &send_stream,
                     &rece_stream,
                     &connection,
-                    &ServiceType::Server,
+                    &EXServerType::Server,
                     local_server_id,
                     &ims_msg_queue,
                     &ims_rct_queue

@@ -5,7 +5,7 @@ use tokio::sync::{ Mutex, RwLock };
 
 use crate::queue::BitcommGramQueue;
 
-use super::{ EXServer, ServiceType };
+use super::{ EXServer, EXServerType };
 
 pub mod server_data;
 
@@ -13,13 +13,13 @@ pub fn init_exserver(
     send_stream: &Arc<Mutex<SendStream>>,
     rece_stream: &Arc<Mutex<ReceiveStream>>,
     connection: &Arc<Connection>,
-    s2smsp_type: &ServiceType,
+    exserver_type: &EXServerType,
     local_server_id: u32,
     ims_msg_queue: &Arc<BitcommGramQueue>,
     ims_rct_queue: &Arc<BitcommGramQueue>
 ) -> EXServer {
     let exserver = EXServer::new(
-        s2smsp_type.clone(),
+        exserver_type.clone(),
         local_server_id,
         ims_msg_queue.clone(),
         ims_rct_queue.clone(),
@@ -38,7 +38,7 @@ pub async fn start_exserver_receive_server(
     let send_stream = set_server.send_stream().clone();
     let msg_queue = set_server.ims_msg_queue().clone();
     let rct_queue = set_server.ims_rct_queue().clone();
-    let s2smsp_type = set_server.s2smsp_type().clone();
+    let exserver_type = set_server.exserver_type().clone();
     let rc_exserver = exserver.clone();
     // let conn = connection.clone();
     let handle = tokio::spawn(async move {
@@ -47,7 +47,7 @@ pub async fn start_exserver_receive_server(
             send_stream.clone(),
             msg_queue.clone(),
             rct_queue.clone(),
-            s2smsp_type,
+            exserver_type,
             rc_exserver
         ).await;
     });
